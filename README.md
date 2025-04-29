@@ -1,2 +1,2 @@
-# algoritmos-2025
-ejercicios y cositas resueltas de algoritmos y estructuras de datos 2025.
+# algoritmos y estructuras de datos 2025
+carpetita personal fachera facherita :)
