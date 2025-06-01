@@ -1,6 +1,6 @@
 #include <iostream>
 using namespace std;
-//Escriba un programa que lea la nota final de cuatro alumnos y calcule la nota final media
+//Escriba un programa que lea la nota final de cuatro alumnos y calcule la nota final media de los cuatro alumnos.
 int main(){
     float notaPrimerAlumno, notaSegundoAlumno, notaTercerAlumno, notaCuartoAlumno, notaFinalMedia;
     cout << "Ingrese las notas de los cuatro alumnos:" << endl;
