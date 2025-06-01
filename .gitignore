@@ -40,3 +40,4 @@ Desktop.ini
 build/
 bin/
 dist/
+.vscode/
