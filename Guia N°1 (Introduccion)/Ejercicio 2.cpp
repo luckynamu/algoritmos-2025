@@ -1,6 +1,7 @@
 #include <iostream>
 using namespace std;
-//ingresar dos numeros. cout la suma resta prod y coc
+/*Escriba un programa que pida al usuario dos números e informe la suma, la resta,
+el producto y el cociente de los mismos*/
 int main(){
     float numeroUno, numeroDos, suma, resta, producto, cociente;
     cout << "Ingrese dos numeros: ";
