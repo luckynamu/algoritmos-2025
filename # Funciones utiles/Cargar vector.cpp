@@ -4,6 +4,6 @@ using namespace std;
 void cargarVector(int vector[], int longitud){
     for (int i = 0; i < longitud; i++){
         cout << "Ingrese un numero: "; //El mensaje puede variar
-        cin >> vector[i]; //Si tengo un struct, vector.parteDelStruct[i]
+        cin >> vector[i]; //Si tengo un struct, vector[i].parteDelStruct
     }
 }
