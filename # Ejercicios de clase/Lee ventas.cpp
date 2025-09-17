@@ -17,9 +17,10 @@ struct VentaImportes{
     float importe;
 };
 
-void localesCta(char [][6],char [],int&);
 void localesCuenta(VentaImportes vector[], char local[], float importe, int&cantLocales);
 void bubbleSort(Venta array[], int longitud);
+bool fechaCoincide(Venta ventitas, char fechaIngresada[]);
+bool periodoCoincide(Venta ventazas, char fechaUno[], char fechaDos[]);
 
 int main() {
     Venta ventas;
@@ -44,15 +45,10 @@ int main() {
         return 1;
     }
     int i = 0;
+
     while (fread(&ventas, sizeof(Venta), 1, archivo) == 1) {
         //localesCuenta(vectorVentas, ventas.local, ventas.precio*ventas.cantidad, cantLocales);
-        bool esIgual = true;
-        for (int j = 0; j < 7; j++){
-            if(ventas.fecha[j] != anioMes[j]){
-                esIgual = false;
-                break;
-            }
-        }
+        bool esIgual = fechaCoincide(ventas, anioMes); 
         if (esIgual){
             /*cout << "Fecha: " << ventas.fecha << " ";
             cout << "Codigo: " << ventas.codigo << "\t";
@@ -86,4 +82,23 @@ void localesCuenta(VentaImportes vector[], char local[], float importe, int&cant
         vector[cantLocales].importe = importe;
         cantLocales++;
     }
+}
+
+bool fechaCoincide(Venta ventitas, char fechaIngresada[]){
+    bool esIgual = true;
+    for (int j = 0; j < 7; j++){
+        if (ventitas.fecha[j] != fechaIngresada[j]){
+            esIgual = false;
+            break;
+        }
+    }
+    return esIgual;
+}
+
+bool periodoCoincide(Venta ventazas, char fechaUno[], char fechaDos[]){
+    char fechaVenta[8];
+    strncpy(fechaVenta, ventazas.fecha, 7);
+    fechaVenta[7] = '\0';
+    bool coincide = (strcmp(fechaVenta, fechaUno) >= 0 && strcmp(fechaVenta, fechaDos) <= 0);
+    return coincide;
 }
