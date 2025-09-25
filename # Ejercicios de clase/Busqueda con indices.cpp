@@ -32,11 +32,14 @@ int main(){
 
     //Mostrar el archivo original de articulos antes de continuar
     mostrarArchivo(archivoArticulos);
+
     //Vuelvo al inicio de mi archivo para no tener problemas
     fseek(archivoArticulos, 0, SEEK_SET);
+
     cargarVectorIndices(archivoArticulos, vectorIndices, tamanioVectorIndices);
     ordenarPorCodigo(vectorIndices, tamanioVectorIndices);
     grabarIndice(archivoIndice, vectorIndices, tamanioVectorIndices);
+    
     int codigoBuscar;
     cout << "Ingrese el codigo de articulo que quiera buscar: ";
     cin >> codigoBuscar;
