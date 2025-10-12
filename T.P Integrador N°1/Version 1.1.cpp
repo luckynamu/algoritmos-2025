@@ -2,7 +2,7 @@
 #include <cstring>
 using namespace std;
 
-struct RegCorredores {
+struct RegCorredores{
     int numero;
     char nombreApellido[50];
     char categoria[50];
@@ -43,25 +43,11 @@ struct CorredoresCiudad{
 };
 
 struct CorredoresCiudadInfo{
+    int numero;
+    char nombreApellido[50];
     char localidad[40];
     char ciudad[30];
-    char tiempoTotal[11];
-};
-
-struct Ciudades{
-    char ciudad[30];
-    int cantidadCorredores;
-    float tiempoTotal;
-};
-
-const int maxCiudades = 1000;
-
-struct Localidades{
-    char localidad[40];
-    Ciudades vectorCiudades[maxCiudades];
-    int cantCiudades;
-    int corredoresTotales;
-    int tiempoSegundos;
+    char llegada[11];
 };
 
 void noTermino(FILE* archivo);
@@ -81,34 +67,37 @@ void mostrarReporte(FILE* archivo);
 void ordenarAlfabeticamente(string vector[], int longitud);
 void extraerPodios(Podios vectorPodios[], int &cantidadPodios, string categorias[], int longitudCategorias, ListadoCarrera vectorCarrera[], int longitudCarrera);
 void mostrarPodios(FILE* archivo);
-void cargarCorredoresCiudad(FILE* archivo, CorredoresCiudad vector[], int &longitud);
+void cargarCorredoresCiudad(FILE* archivo, CorredoresCiudadInfo vector[], int &longitud);
+void cargarLlegada(CorredoresCiudadInfo vectorCiudad[], int longitudCorredoresCiudad, RegCorredores vectorCorredores[], int longitudCorredores);
+void ordenarPorLocalidadCiudad(CorredoresCiudadInfo vectorCiudad[], int longitud);
+void reporteCiudades(CorredoresCiudadInfo vector[], int longitud);
 
 int main(){
-    FILE *archivoCorredores = fopen("C:/Users/mvpas/Documents/Universidad/Algoritmos y Estructuras de Datos/Archivos de T.P/Archivo corredores 4Refugios.bin", "rb+");
+    FILE *archivoCorredores = fopen("C:/Users/mvpas/Documents/Universidad/Algoritmos y Estructuras de Datos/Archivos de TP/Archivo corredores 4Refugios.bin", "rb+");
     if (!archivoCorredores){
         cout << "No se pudo abrir el archivo Corredores 4Refugios.bin\n";
         return 1;
     }
 
-    FILE *archivoClasica = fopen("C:/Users/mvpas/Documents/Universidad/Algoritmos y Estructuras de Datos/Archivos de T.P/clasica.bin", "wb+");
+    FILE *archivoClasica = fopen("C:/Users/mvpas/Documents/Universidad/Algoritmos y Estructuras de Datos/Archivos de TP/clasica.bin", "wb+");
     if (!archivoClasica){
         cout << "No se pudo abrir el archivo clasica.bin\n";
         return 1;
     }
 
-    FILE *archivoNonStop = fopen("C:/Users/mvpas/Documents/Universidad/Algoritmos y Estructuras de Datos/Archivos de T.P/nonStop.bin", "wb+");
+    FILE *archivoNonStop = fopen("C:/Users/mvpas/Documents/Universidad/Algoritmos y Estructuras de Datos/Archivos de TP/nonStop.bin", "wb+");
     if (!archivoNonStop){
         cout << "No se pudo abrir el archivo nonStop.bin\n";
         return 1;
     }
     
-    FILE *archivoPodios = fopen("C:/Users/mvpas/Documents/Universidad/Algoritmos y Estructuras de Datos/Archivos de T.P/podios.bin", "wb+");
+    FILE *archivoPodios = fopen("C:/Users/mvpas/Documents/Universidad/Algoritmos y Estructuras de Datos/Archivos de TP/podios.bin", "wb+");
     if (!archivoPodios){
         cout << "No se pudo abrir el archivo podios.bin\n";
         return 1;
     }
 
-    FILE *archivoCiudades = fopen("C:/Users/mvpas/Documents/Universidad/Algoritmos y Estructuras de Datos/Archivos de T.P/Ciudades.bin", "rb");
+    FILE *archivoCiudades = fopen("C:/Users/mvpas/Documents/Universidad/Algoritmos y Estructuras de Datos/Archivos de TP/Ciudades.bin", "rb");
     if (!archivoCiudades){
         cout << "No se pudo abrir el archivo Ciudades.bin\n";
         return 1;
@@ -190,15 +179,18 @@ int main(){
     fclose(archivoPodios);
 
     //Paso 14: Leemos el archivo Ciudades y cargamos sus datos a un vector.
-    CorredoresCiudad vectorCorredoresCiudad[2000];
+    CorredoresCiudadInfo vectorCorredoresCiudad[2000];
     int cantidadCorredoresCiudades = 0;
     cargarCorredoresCiudad(archivoCiudades, vectorCorredoresCiudad, cantidadCorredoresCiudades);
 
-    //Paso 15: Buscamos los corredores del archivo original que coincidan con los numeros del archivo Ciudades.
-    Localidades vectorLocalidades[cantidadCorredoresCiudades];
-    int cantidadLocalidades = 0;
+    //Paso 15: Para cada corredor, buscar en el vector original utilizando su numero, el tiempo de llegada.
+    cargarLlegada(vectorCorredoresCiudad, cantidadCorredoresCiudades, vectorCorredores, cantidadCorredores);
 
-
+    //Paso 16: Ordenamos el vector CorredoresCiudad por localidad y luego por ciudad.
+    ordenarPorLocalidadCiudad(vectorCorredoresCiudad, cantidadCorredoresCiudades);
+    
+    //Paso 17: Mostrar el reporte de cada localidad y ciudad.
+    reporteCiudades(vectorCorredoresCiudad, cantidadCorredoresCiudades);
     return 0;    
 }
 
@@ -491,17 +483,112 @@ void mostrarPodios(FILE* archivo){
     }
 }
 
-void cargarCorredoresCiudad(FILE* archivo, RegCorredores vectorCorredores[], int longitudCorredores, CorredoresCiudadInfo vector[], int &longitud){
+void cargarCorredoresCiudad(FILE* archivo, CorredoresCiudadInfo vector[], int &longitud){
     CorredoresCiudad corredores;
     longitud = 0;
     while(fread(&corredores, sizeof(CorredoresCiudad), 1, archivo) == 1){
-        for(int i = 0; i < longitudCorredores; i++){
-            if(vectorCorredores[i].numero == corredores.numero){
-                strcpy(vector[longitud].localidad, vectorCorredores[i].localidad);
-                strcpy(vector[longitud].ciudad, corredores.ciudad);
-                strcpy(vector[longitud].tiempoTotal, vectorCorredores[i].llegada);
-                longitud++;
-                break;
+        vector[longitud].numero = corredores.numero;
+        strcpy(vector[longitud].localidad, corredores.localidad);
+        strcpy(vector[longitud].ciudad, corredores.ciudad);
+        longitud++;
+    }
+}
+
+void cargarLlegada(CorredoresCiudadInfo vectorCiudad[], int longitudCorredoresCiudad, RegCorredores vectorCorredores[], int longitudCorredores){
+    for(int i = 0; i < longitudCorredoresCiudad; i++){
+        for(int j=0; j < longitudCorredores; j++){
+            if(vectorCiudad[i].numero == vectorCorredores[j].numero){
+                strcpy(vectorCiudad[i].llegada, vectorCorredores[j].llegada);  
+                break;             
+            }
+        }
+    }    
+}
+
+void ordenarPorLocalidadCiudad(CorredoresCiudadInfo vectorCiudad[], int longitud){
+    for (int i = 0; i < longitud; i++ ){
+        for (int j = 0; j < longitud - i - 1; j++){
+            if (strcmp(vectorCiudad[j].localidad, vectorCiudad[j+1].localidad) > 0){
+                CorredoresCiudadInfo auxiliar = vectorCiudad[j];
+                vectorCiudad[j] = vectorCiudad[j+1];
+                vectorCiudad[j+1] = auxiliar;
+            }
+            else if(strcmp(vectorCiudad[j].localidad, vectorCiudad[j+1].localidad) == 0){
+                if (strcmp(vectorCiudad[j].ciudad, vectorCiudad[j+1].ciudad) > 0){
+                    CorredoresCiudadInfo auxiliar = vectorCiudad[j];
+                    vectorCiudad[j] = vectorCiudad[j+1];
+                    vectorCiudad[j+1] = auxiliar;
+                }
+            }
+        }
+    }
+}
+
+void reporteCiudades(CorredoresCiudadInfo vector[], int longitud) {
+    if (longitud == 0) return;
+
+    char localidadActual[40];
+    char ciudadActual[30];
+    strcpy(localidadActual, vector[0].localidad);
+    strcpy(ciudadActual, vector[0].ciudad);
+
+    int corredoresLocalidad = 0;
+    float tiempoTotalLocalidad = 0;
+
+    int corredoresCiudad = 0;
+    float tiempoTotalCiudad = 0;
+
+    for (int i = 0; i < longitud; i++) {
+        float tiempo = convertirASegundos(vector[i].llegada);
+        if (tiempo != -1) {
+            tiempoTotalCiudad += tiempo;
+            tiempoTotalLocalidad += tiempo;
+        }
+        corredoresCiudad++;
+        corredoresLocalidad++;
+
+        bool cambiaCiudad = (i == longitud - 1) || strcmp(vector[i].ciudad, vector[i + 1].ciudad) != 0;
+        bool cambiaLocalidad = (i == longitud - 1) || strcmp(vector[i].localidad, vector[i + 1].localidad) != 0;
+
+        if (cambiaCiudad) {
+            float promedioCiudad = (corredoresCiudad > 0) ? tiempoTotalCiudad / corredoresCiudad : 0;
+            cout << "Localidad: " << localidadActual << " | Ciudad: " << ciudadActual
+                 << " | Corredores: " << corredoresCiudad
+                 << " | Tiempo promedio: ";
+            if (promedioCiudad > 0) {
+                char tiempoProm[11];
+                segundosAFormato(promedioCiudad, tiempoProm);
+                cout << tiempoProm;
+            } else {
+                cout << "-";
+            }
+            cout << endl;
+
+            corredoresCiudad = 0;
+            tiempoTotalCiudad = 0;
+            if (!cambiaLocalidad && i + 1 < longitud)
+                strcpy(ciudadActual, vector[i + 1].ciudad);
+        }
+
+        if (cambiaLocalidad) {
+            float promedioLocalidad = (corredoresLocalidad > 0) ? tiempoTotalLocalidad / corredoresLocalidad : 0;
+            cout << "Resumen Localidad: " << localidadActual
+                 << " | Corredores: " << corredoresLocalidad
+                 << " | Tiempo promedio: ";
+            if (promedioLocalidad > 0) {
+                char tiempoPromLoc[11];
+                segundosAFormato(promedioLocalidad, tiempoPromLoc);
+                cout << tiempoPromLoc;
+            } else {
+                cout << "-";
+            }
+            cout << endl << "----------------------------------------" << endl;
+
+            corredoresLocalidad = 0;
+            tiempoTotalLocalidad = 0;
+            if (i + 1 < longitud) {
+                strcpy(localidadActual, vector[i + 1].localidad);
+                strcpy(ciudadActual, vector[i + 1].ciudad);
             }
         }
     }
