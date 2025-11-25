@@ -1,7 +1,7 @@
 #include <iostream>
 #include <cstring>
 using namespace std;
-
+//Struct original del archivo.
 struct RegCorredores{
     int numero;
     char nombreApellido[50];
@@ -35,6 +35,7 @@ struct Podios{
     char llegada[11];
 };
 
+//Struct original.
 struct CorredoresCiudad{
     int numero;
     char nombreApellido[50];
@@ -74,30 +75,31 @@ int cantidadDigitos(int n);
 void reporteCiudades(CorredoresCiudadInfo vector[], int longitud);
 
 int main(){
+    //Archivo abierto dado por la consigna.
     FILE *archivoCorredores = fopen("C:/Users/mvpas/Documents/Universidad/Algoritmos y Estructuras de Datos/Archivos de TP/Archivo corredores 4Refugios.bin", "rb+");
     if (!archivoCorredores){
         cout << "No se pudo abrir el archivo Corredores 4Refugios.bin\n";
         return 1;
     }
-
+    //Archivo de salida.
     FILE *archivoClasica = fopen("C:/Users/mvpas/Documents/Universidad/Algoritmos y Estructuras de Datos/Archivos de TP/clasica.bin", "wb+");
     if (!archivoClasica){
         cout << "No se pudo abrir el archivo clasica.bin\n";
         return 1;
     }
-
+    //Archivo de salida.
     FILE *archivoNonStop = fopen("C:/Users/mvpas/Documents/Universidad/Algoritmos y Estructuras de Datos/Archivos de TP/nonStop.bin", "wb+");
     if (!archivoNonStop){
         cout << "No se pudo abrir el archivo nonStop.bin\n";
         return 1;
     }
-    
+    //Archivo de salida.
     FILE *archivoPodios = fopen("C:/Users/mvpas/Documents/Universidad/Algoritmos y Estructuras de Datos/Archivos de TP/podios.bin", "wb+");
     if (!archivoPodios){
         cout << "No se pudo abrir el archivo podios.bin\n";
         return 1;
     }
-
+    //Archivo abierto dado por la consigna.
     FILE *archivoCiudades = fopen("C:/Users/mvpas/Documents/Universidad/Algoritmos y Estructuras de Datos/Archivos de TP/Ciudades.bin", "rb");
     if (!archivoCiudades){
         cout << "No se pudo abrir el archivo Ciudades.bin\n";
@@ -332,7 +334,7 @@ float convertirASegundos(char llegada[]){
 }
 
 void segundosAFormato(float tiempo, char llegada[]){
-    int horas = tiempo/3600;
+    int horas = tiempo/3600; 
     tiempo -= horas*3600;
     int minutos = tiempo/60;
     tiempo -= minutos*60;
@@ -423,7 +425,7 @@ void mostrarReporte(FILE* archivo){
     cout << "Pos. Gral.\t";
     cout << "Pos. Gen.\t";
     cout << "Pos. Cat.\t";
-    cout << "Nro.\t";
+    cout << "Nro.\t"; 
     cout << "Nombre y apellido";
     imprimirEspacios(sizeof(carreras.nombreApellido) - strlen("Nombre y apellido"));
     cout << "Categoria";
@@ -593,6 +595,7 @@ void reporteCiudades(CorredoresCiudadInfo vector[], int longitud){
     strcpy(ciudadActual, vector[0].ciudad);
     //Establecemos los contadores.
     int corredoresLocalidad = 0;
+    //Falta int corredoresQueTerminaron = 0;
     float tiempoTotalLocalidad = 0;
     int corredoresCiudad = 0;
     float tiempoTotalCiudad = 0;
@@ -604,6 +607,8 @@ void reporteCiudades(CorredoresCiudadInfo vector[], int longitud){
         if (tiempo != -1) {
             tiempoTotalCiudad += tiempo;
             tiempoTotalLocalidad += tiempo;
+            //Faltaría agregar un int corredoresQueTerminaron++; para calcular el promedio.
+
         }
         corredoresCiudad++;
         corredoresLocalidad++;
@@ -613,7 +618,7 @@ void reporteCiudades(CorredoresCiudadInfo vector[], int longitud){
 
         //Si cambia la ciudad en la siguiente posicion, mostramos sus totales y promedios.
         if (cambiaCiudad){
-            float promedioCiudad = tiempoTotalCiudad / corredoresCiudad;
+            float promedioCiudad = tiempoTotalCiudad / corredoresCiudad; //Cambiar corredoresCiudad por corredoresQueTerminaron
             if (mostrarLocalidad){
                 cout << localidadActual;
                 imprimirEspacios(sizeof(vector[i].localidad) - strlen(localidadActual));
@@ -629,6 +634,7 @@ void reporteCiudades(CorredoresCiudadInfo vector[], int longitud){
             segundosAFormato(promedioCiudad, tiempoPromedioCiudad);
             cout << tiempoPromedioCiudad << endl;
 
+            //corredoresQueTerminaron = 0;
             corredoresCiudad = 0;
             tiempoTotalCiudad = 0;
             if (!cambiaLocalidad && (i + 1) < longitud){

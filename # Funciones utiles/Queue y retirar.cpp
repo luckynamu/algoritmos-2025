@@ -11,7 +11,9 @@ void queue(Nodo*&frente, Nodo*&fin, int x){
     p -> info = x;
     p -> sgte = NULL;
     if(frente == NULL){
-        frente = p;}
+        frente = p;
+        fin = p;
+    }
     else{
         fin -> sgte = p;
         fin = p;

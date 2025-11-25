@@ -1,5 +1,7 @@
 #include <iostream>
 using namespace std;
+/*Indique si el siguiente código compila en un main. Si no compila, justifique.
+En caso de ser correcto, escriba la salida por pantalla.*/
 int main(){
     FILE *f;
     int x;
@@ -21,4 +23,15 @@ int main(){
     }
     fclose (f);
     return 0;
+    /*La salida es:
+    101
+    102
+    12
+    13
+    14
+    106
+    0
+    0
+    0
+    0*/
 }
